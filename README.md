@@ -1,2 +1,2 @@
 # corrupto.sh
-Script para resolver problemas de corrupção.
+Script para verificar problemas de disco
