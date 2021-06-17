@@ -18,13 +18,13 @@ disks_failed=();
 echo "> Verificando smartctl (Aguarde!) ";
 for i in `seq $ini $end`; 
     do
-        Command_Timeout_td=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $11}' | tr -d '[:space:]'`;
-        if [ -z "$Command_Timeout_td" ];
-            then
-                Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10}'`;
-            else
-                Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10 + $11 + $12 }'`;
-        fi;
+        #Command_Timeout_td=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $11}' | tr -d '[:space:]'`;
+        #if [ -z "$Command_Timeout_td" ];
+        #    then
+        #        Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10}'`;
+        #    else
+        #        Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10 + $11 + $12 }'`;
+        #fi;
         reallocated_Sector_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct' | awk '{print $NF}'`;
         Offline_Uncorrectable_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Offline_Uncorrectable' | awk '{print $NF}'`;
         Reported_Uncorrect_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reported_Uncorrect' | awk '{print $NF}'`;
@@ -35,7 +35,7 @@ for i in `seq $ini $end`;
         Reported_Uncorrect=${Reported_Uncorrect_t:="1"};
         End_to_End=${End_to_End_t:="1"};
         all_erros=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error'`;
-        if [ -z "$all_erros" -o "$reallocated_Sector" -gt "0" -o "$Offline_Uncorrectable" -gt "0" -o "$Reported_Uncorrect" -gt "0" -o "$End_to_End" -gt "0" -o "$Command_Timeout" -gt "0" ];
+        if [ -z "$all_erros" -o "$reallocated_Sector" -gt "0" -o "$Offline_Uncorrectable" -gt "0" -o "$Reported_Uncorrect" -gt "0" -o "$End_to_End" -gt "0" ];
             then
                 let inc_smart++;
                 disks_failed[$inc_smart]=$i;
