@@ -2,56 +2,64 @@
 servidor=`hostname`;
 if [ $servidor = "box5" -o $servidor = "box6" -o $servidor = "bkp1" ];
     then
-        echo " "
-        echo "========== Disk doctor 16-31 (box5|box6|bkp1) =========="
-        echo " "
+        echo " ";
+        echo "========== Disk doctor 16-31 (box5|box6|bkp1) ==========";
+        echo " ";
         ini="16";
         end="31";
     else
-        echo " "
-        echo "========== Disk doctor 29-52 =========="
-        echo " "
+        echo " ";
+        echo "========== Disk doctor 29-52 ==========";
+        echo " ";
         ini="29";
         end="52";
 fi
-disks_failed=()
-echo "> Verificando smartctl (Aguarde!) "
+disks_failed=();
+echo "> Verificando smartctl (Aguarde!) ";
 for i in `seq $ini $end`; 
     do
+        Command_Timeout_td=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $11}' | tr -d '[:space:]'`;
+        if [ -z "$Command_Timeout_td" ];
+            then
+                Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10}'`;
+            else
+                Command_Timeout_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Command_Timeout' | awk '{print $10 + $11 + $12 }'`;
+        fi;
         reallocated_Sector_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct' | awk '{print $NF}'`;
         Offline_Uncorrectable_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Offline_Uncorrectable' | awk '{print $NF}'`;
         Reported_Uncorrect_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reported_Uncorrect' | awk '{print $NF}'`;
         End_to_End_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'End-to-End_Error' | awk '{print $NF}'`;
+        Command_Timeout=${Command_Timeout_t:="1"};
         reallocated_Sector=${reallocated_Sector_t:="1"};
         Offline_Uncorrectable=${Offline_Uncorrectable_t:="1"};
         Reported_Uncorrect=${Reported_Uncorrect_t:="1"};
         End_to_End=${End_to_End_t:="1"};
         all_erros=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error'`;
-        if [ -z "$all_erros" -o "$reallocated_Sector" -gt "0" -o "$Offline_Uncorrectable" -gt "0" -o "$Reported_Uncorrect" -gt "0" -o "$End_to_End" -gt "0" ];
+        if [ -z "$all_erros" -o "$reallocated_Sector" -gt "0" -o "$Offline_Uncorrectable" -gt "0" -o "$Reported_Uncorrect" -gt "0" -o "$End_to_End" -gt "0" -o "$Command_Timeout" -gt "0" ];
             then
                 let inc_smart++;
                 disks_failed[$inc_smart]=$i;
-        fi
-done
+        fi;
+done;
 if [ -z "$inc_smart" -o ${#disks_failed[@]} -eq 0 ];    
     then
-        echo "=========================="
-        echo "= Não têm disco com erro ="
-        echo "=========================="
+        echo "==========================";
+        echo "= Não têm disco com erro =";
+        echo "==========================";
         exit;
 fi
-echo "> Total de $inc_smart discos com problema!"
-echo "> Verificando raidstatus (Aguarde!)"
-echo " "
-raid_disks=()
+echo "> Total de $inc_smart discos com problema!";
+echo "> Verificando raidstatus (Aguarde!)";
+echo " ";
+raid_disks=();
 for l in ${disks_failed[*]};
     do
         raid_fisico=`raidstatus show disks | grep -m1 "Disk $l" | cut -d "[" -f2 | cut -d "]" -f1`;
         serial=`smartctl -a /dev/sdc -d megaraid,$l | grep Serial | cut -d ":" -f2 | tr -d '[:space:]'`;
         raid_fisico_ofc=${raid_fisico:="SN"};
         serial_ofc=${serial:="SN"};
-        echo " - Disco $l - [$raid_fisico_ofc] - $serial_ofc"
-done
-echo " "
-echo "> Teminado!"
+        echo " - Disco $l - [$raid_fisico_ofc] - $serial_ofc";
+done;
+echo " ";
+echo "> Teminado!";
 exit;
