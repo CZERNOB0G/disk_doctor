@@ -29,7 +29,7 @@ for i in `seq $ini $end`;
         Offline_Uncorrectable_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Offline_Uncorrectable' | awk '{print $NF}'`;
         Reported_Uncorrect_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reported_Uncorrect' | awk '{print $NF}'`;
         End_to_End_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'End-to-End_Error' | awk '{print $NF}'`;
-        Command_Timeout=${Command_Timeout_t:="1"};
+        #Command_Timeout=${Command_Timeout_t:="1"};
         reallocated_Sector=${reallocated_Sector_t:="1"};
         Offline_Uncorrectable=${Offline_Uncorrectable_t:="1"};
         Reported_Uncorrect=${Reported_Uncorrect_t:="1"};
