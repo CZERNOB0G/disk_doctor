@@ -1,6 +1,6 @@
 #!/bin/bash
 servidor=`hostname`;
-if [ $servidor = "box5" -o $servidor = "box6" ];
+if [ $servidor = "box5" -o $servidor = "box6" -o $servidor = "bkp1" ];
     then
         ini="16";
         end="31";
