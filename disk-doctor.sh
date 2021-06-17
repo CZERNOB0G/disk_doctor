@@ -2,9 +2,15 @@
 servidor=`hostname`;
 if [ $servidor = "box5" -o $servidor = "box6" -o $servidor = "bkp1" ];
     then
+        echo " "
+        echo "========== Disk doctor 16-31 (box5|box6|bkp1) =========="
+        echo " "
         ini="16";
         end="31";
     else
+        echo " "
+        echo "========== Disk doctor 29-52 =========="
+        echo " "
         ini="29";
         end="52";
 fi
@@ -36,6 +42,7 @@ if [ -z "$inc_smart" -o ${#disks_failed[@]} -eq 0 ];
 fi
 echo "> Total de $inc_smart discos com problema!"
 echo "> Verificando raidstatus (Aguarde!)"
+echo " "
 raid_disks=()
 for l in ${disks_failed[*]};
     do
@@ -45,5 +52,6 @@ for l in ${disks_failed[*]};
         serial_ofc=${serial:="SN"};
         echo " - Disco $l - [$raid_fisico_ofc] - $serial_ofc"
 done
+echo " "
 echo "> Teminado!"
 exit;
