@@ -1,8 +1,13 @@
 #!/bin/bash
-init="$1";
-endt="$2";
-ini=${init:="29"};
-end=${endt:="52"};
+servidor=`hostname`;
+if [ $servidor = "box5" -o $servidor = "box6" ];
+    then
+        ini="16";
+        end="31";
+    else
+        ini="29";
+        end="52";
+fi
 disks_failed=()
 echo "> Verificando smartctl (Aguarde!) "
 for i in `seq $ini $end`; 
