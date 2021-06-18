@@ -17,14 +17,14 @@ fi
 total_erros=();
 disks_failed=();
 echo "> Verificando smartctl (Aguarde!) ";
-for i in `seq $ini $end`; 
+for i in `seq $ini $end`;
     do
-        all_erros=` smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error' | awk '{print $NF}' | awk '{sum+=$1} END {print sum}'`;
-        if [ -z $all_erros ];
+        all_erros_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error' | awk '{print $NF}' | awk '{sum+=$1} END {print sum}'`;
+        if [ -z $all_erros_t ];
             then
-                $all_erros="1";
                 null="Queimado!";
         fi
+        all_erros=${all_erros_t:="1"};
         if [ "$all_erros" -gt "0" -o -n "$null" ];
             then
                 let inc_smart++;
@@ -36,7 +36,9 @@ for i in `seq $ini $end`;
                         total_erros[$i]="$null";
                 fi
         fi;
+        unset null
 done;
+
 if [ -z "$inc_smart" ];    
     then
         echo "==========================";
