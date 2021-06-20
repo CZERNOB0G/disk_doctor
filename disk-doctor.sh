@@ -38,7 +38,6 @@ for i in `seq $ini $end`;
         fi;
         unset null
 done;
-
 if [ -z "$inc_smart" ];    
     then
         echo "==========================";
