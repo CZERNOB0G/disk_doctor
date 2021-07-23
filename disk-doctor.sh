@@ -8,15 +8,20 @@ if [ -z $bkbox ];
                 if [ -n "$hd" ];
                     then
                         all_errors=`smartctl -A /dev/sd$l | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error' | awk '{print $NF}' | awk '{sum+=$1} END {print sum}'`;
-                        all_errors=${all_errors:="1"};
-                        health=`smartctl -H /dev/sd$l | awk -F'result:' '{print $2}' | grep [[:alnum:]] | sed 's/ //g'`;
-                        if [ -z "$nullo" -a "$health" != "PASSED" ];
+                        if [ -z $all_errors ];
                             then
-                                let $all_errors++
+                                null="NULL!";
                         fi
+                        all_errors=${all_errors:="1"};
                         if [ "$all_errors" -gt "0" ];
                             then
-                                echo "sd$l: $all_errors"
+                                serial=`smartctl -a /dev/sd$l | grep Serial | cut -d ":" -f2 | tr -d '[:space:]'`;
+                                if [ -z $null ];
+                                    then
+                                        echo "sd$l - $serial - $all_errors Errors"
+                                    else
+                                        echo "sd$l - $serial - $null"
+                                fi
                         fi
                         unset all_errors
                         unset null
@@ -27,12 +32,12 @@ if [ -z $bkbox ];
         disks_failed=();
         for i in `seq 29 52`;
             do
-                all_erros_t=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error' | awk '{print $NF}' | awk '{sum+=$1} END {print sum}'`;
-                if [ -z $all_erros_t ];
+                all_errors=`smartctl -A /dev/sdc -d megaraid,$i | grep -P 'Reallocated_Sector_Ct|Offline_Uncorrectable|Reported_Uncorrect|End-to-End_Error' | awk '{print $NF}' | awk '{sum+=$1} END {print sum}'`;
+                if [ -z $all_errors ];
                     then
                         null="NULL!";
                 fi
-                all_erros=${all_erros_t:="1"};
+                all_erros=${all_errors:="1"};
                 if [ "$all_erros" -gt "0" -o -n "$null" ];
                     then
                         let inc_smart++;
