@@ -16,6 +16,7 @@ if [ -z $bkbox ];
                         if [ "$all_errors" -gt "0" ];
                             then
                                 serial=`smartctl -a /dev/sd$l | grep Serial | cut -d ":" -f2 | tr -d '[:space:]'`;
+                                serial=${serial:="NULL"};
                                 if [ -z $null ];
                                     then
                                         echo "sd$l - $serial - $all_errors Errors"
